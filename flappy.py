@@ -20,8 +20,8 @@ def main():
     #pipes.append(components.Pipe(WIDTH, HEIGHT))
     pipes_spawn_timer = 10
 
-    bird = Bird(100, (HEIGHT-100) // 2)
-    # flock = population.Population(10)
+    # bird = Bird(100, (HEIGHT-100) // 2)
+    flock = population.Population(100)
 
     while True:
         SCREEN.fill(BLACK)
@@ -29,9 +29,9 @@ def main():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
-                    bird.flap()
+            # if event.type == pygame.KEYDOWN:
+            #     if event.key == pygame.K_SPACE:
+            #         bird.flap()
         
         ground.draw(SCREEN)
 
@@ -41,12 +41,19 @@ def main():
         pipes_spawn_timer -= 1
         for pipe in pipes:
             pipe.draw(SCREEN)
-            pipe.move(1)
+            pipe.move(2)
         for pipe in pipes:
             if pipe.off_screen:
                 pipes.remove(pipe)
-        bird.update(ground, pipes)
-        bird.draw(SCREEN)
+        if not flock.extinct():
+            flock.update_live_birds(ground, pipes, SCREEN)
+        else:
+            pipes.clear()
+            pipes_spawn_timer = 10
+
+            flock.natural_selection()
+        # bird.update(ground, pipes)
+        # bird.draw(SCREEN)
         # flock.draw(SCREEN)
         
         CLOCK.tick(60)
