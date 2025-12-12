@@ -27,7 +27,7 @@ class Pipe:
     width = 52
     opening = 150
 
-    def __init__(self, win_width: int, win_height: int, ground_height: int = 100):
+    def __init__(self, win_width: int, win_height: int, top_img, bottom_img, ground_height: int = 100):
         self.x = win_width
         self.top_height = random.randint(50, win_height - ground_height - self.opening - 50)
         self.bottom_height = win_height - (self.top_height + self.opening) - ground_height
@@ -35,14 +35,14 @@ class Pipe:
         self.bottom_rect = pygame.Rect(self.x, self.top_height + self.opening, self.width, self.bottom_height)
         self.passed = False
         self.off_screen = False
+        self.top_pipe_img = top_img.subsurface((0, top_img.get_height() - self.top_height, 52, self.top_height))
+        self.bottom_pipe_img = bottom_img.subsurface((0, 0, 52, self.bottom_height))
     
-    def draw(self, window: pygame.Surface, top_img: pygame.Surface, bottom_img: pygame.Surface) -> None:
+    def draw(self, window: pygame.Surface) -> None:
         self.top_rect.x = self.x
         self.bottom_rect.x = self.x
-        top_scaled = pygame.transform.scale(top_img, (self.width, self.top_height))
-        bottom_scaled = pygame.transform.scale(bottom_img, (self.width, self.bottom_height))
-        window.blit(top_scaled, (self.x, 0))
-        window.blit(bottom_scaled, (self.x, self.top_height + self.opening))
+        window.blit(self.top_pipe_img, (self.x, 0))
+        window.blit(self.bottom_pipe_img, (self.x, self.top_height + self.opening))
 
     def move(self, speed: int) -> None:
         self.x -= speed
