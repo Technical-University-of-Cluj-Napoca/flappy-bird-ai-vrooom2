@@ -2,34 +2,47 @@ import pygame
 import random
 
 class Ground:
-    def __init__(self, win_width: int, ground_level: int):
+    def __init__(self, win_width: int, ground_level: int, image: pygame.Surface):
         self.x = 0
         self.y = ground_level
-        self.rect = pygame.Rect(self.x, self.y, win_width, 5)
-        self.color = (240, 240, 240)
+        self.image = image
+        self.width = self.image.get_width()
+        self.x1 = 0
+        self.x2 = self.width
+        self.rect = pygame.Rect(self.x, self.y, win_width, 100)
+
+    def move(self, speed: int):
+        self.x1 -= speed
+        self.x2 -= speed
+        if self.x1 + self.width < 0:
+            self.x1 = self.x2 + self.width
+        if self.x2 + self.width < 0:
+            self.x2 = self.x1 + self.width
     
     def draw(self, window: pygame.Surface) -> None:
-        pygame.draw.rect(window, self.color, self.rect)
+        window.blit(self.image, (self.x1, self.y))
+        window.blit(self.image, (self.x2, self.y))
 
 class Pipe:
-    width = 15
-    opening = 100
+    width = 52
+    opening = 150
 
     def __init__(self, win_width: int, win_height: int, ground_height: int = 100):
         self.x = win_width
-        self.top_height = random.randint(50, win_height - 250)
+        self.top_height = random.randint(50, win_height - ground_height - self.opening - 50)
         self.bottom_height = win_height - (self.top_height + self.opening) - ground_height
         self.top_rect = pygame.Rect(self.x, 0, self.width, self.top_height)
         self.bottom_rect = pygame.Rect(self.x, self.top_height + self.opening, self.width, self.bottom_height)
-        self.color = (147, 233, 190)
         self.passed = False
         self.off_screen = False
     
-    def draw(self, window: pygame.Surface) -> None:
+    def draw(self, window: pygame.Surface, top_img: pygame.Surface, bottom_img: pygame.Surface) -> None:
         self.top_rect.x = self.x
         self.bottom_rect.x = self.x
-        pygame.draw.rect(window, self.color, self.top_rect)
-        pygame.draw.rect(window, self.color, self.bottom_rect)
+        top_scaled = pygame.transform.scale(top_img, (self.width, self.top_height))
+        bottom_scaled = pygame.transform.scale(bottom_img, (self.width, self.bottom_height))
+        window.blit(top_scaled, (self.x, 0))
+        window.blit(bottom_scaled, (self.x, self.top_height + self.opening))
 
     def move(self, speed: int) -> None:
         self.x -= speed

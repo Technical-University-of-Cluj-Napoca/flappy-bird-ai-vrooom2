@@ -3,11 +3,13 @@ import random
 from components import Pipe, Ground
 
 class Bird:
-    def __init__(self, x: int, y: int):
+    def __init__(self, x: int, y: int, images: list):
         self.x = x
         self.y = y
-        self.radius = 10
-        self.color = (255, 244, 79)
+        self.images = images
+        self.image = self.images[0]
+        self.img_index = 0
+        self.radius = 15
         self.velocity = 0
         self.isFlapping = False
         self.alive = True
@@ -34,7 +36,28 @@ class Bird:
             self.velocity = 0
 
     def draw(self, window: pygame.Surface) -> None:
-        pygame.draw.circle(window, self.color, (self.x, self.y), self.radius)
+        self.img_index += 1
+        if self.img_index < 5:
+            self.image = self.images[0]
+        elif self.img_index < 10:
+            self.image = self.images[1]
+        elif self.img_index < 15:
+            self.image = self.images[2]
+        elif self.img_index < 20:
+            self.image = self.images[1]
+        else:
+            self.image = self.images[0]
+            self.img_index = 0
+
+        if self.velocity < 0:
+            rotated_image = pygame.transform.rotate(self.image, 25)
+        elif self.velocity > 2:
+            rotated_image = pygame.transform.rotate(self.image, -25)
+        else:
+            rotated_image = self.image
+
+        rect = rotated_image.get_rect(center=(self.x, self.y))
+        window.blit(rotated_image, rect.topleft)
 
     def get_rect(self) -> pygame.Rect:
         return pygame.Rect(self.x - self.radius, self.y - self.radius, self.radius * 2, self.radius * 2)
